@@ -18,6 +18,13 @@ The end goal is to be able to create alerts from the logs ingested by Loki.
 apiVersion: mirror.openshift.io/v1alpha2
 kind: ImageSetConfiguration
 mirror:
+  platform:
+   channels:
+   - name: stable-4.12
+     minVersion: '4.12.0'
+     maxVersion: '4.12.0'
+     type: ocp
+   graph: true
   operators:
    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.12
      full: false
@@ -52,6 +59,65 @@ mirror:
          maxVersion: 'v4.12.1'
          channels:
            - name: 'stable-4.12'
+~~~
+
+Mirroring the `imageset-config.yaml` file in the privte registry:
+~~~sh
+oc-mirror --config imageset-config-loki.yaml docker://inbacrnrdl0102.offline.redhat.lan:5051/loki-demo
+~~~
+
+`imageContentSourcePolicy.yaml`
+~~~sh
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: generic-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/ubi8
+    source: registry.access.redhat.com/ubi8
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catalog: "true"
+  name: operator-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/openshift-logging
+    source: registry.redhat.io/openshift-logging
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/rhel8
+    source: registry.redhat.io/rhel8
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/rhceph
+    source: registry.redhat.io/rhceph
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/redhat
+    source: registry.redhat.io/redhat
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/odf4
+    source: registry.redhat.io/odf4
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: release-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release
+  - mirrors:
+    - inbacrnrdl0102.offline.redhat.lan:5051/loki-demo/openshift/release
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
 ~~~
 
 ## Required Operators Deployment
