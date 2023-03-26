@@ -12,6 +12,47 @@ Versions used:
 
 The end goal is to be able to create alerts from the logs ingested by Loki.
 
+## install-config.yaml file required for a Disconnected Environment
+
+```bash
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.12
+     full: false
+     packages:
+       - name: loki-operator
+         minVersion: 'v5.6.3'
+         maxVersion: 'v5.6.3'
+         channels:
+           - name: 'stable'
+       - name: cluster-logging
+         minVersion: 'v5.6.3'
+         maxVersion: 'v5.6.3'
+         channels:
+           - name: 'stable'
+       - name: local-storage-operator
+         minVersion: 'v4.12.0-202303081116'
+         maxVersion: 'v4.12.0-202303081116'
+         channels:
+           - name: 'stable'
+       - name: odf-operator
+         minVersion: 'v4.12.1'
+         maxVersion: 'v4.12.1'
+         channels:
+           - name: 'stable-4.12'
+       - name: ocs-operator
+         minVersion: 'v4.12.1'
+         maxVersion: 'v4.12.1'
+         channels:
+           - name: 'stable-4.12'
+       - name: mcg-operator
+         minVersion: 'v4.12.1'
+         maxVersion: 'v4.12.1'
+         channels:
+           - name: 'stable-4.12'
+```
 ## Required Operators Deployment
 
 Two operators are required, on one hand the Cluster Logging Operator will manage the Cluster Logging subsystem while on the other hand the Loki Operator will manage the Loki subsystem.
